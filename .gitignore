@@ -1,5 +1,7 @@
 build/
 cmake-build/
+release/
+release.zip
 .vs/
 .vscode/
 *.suo

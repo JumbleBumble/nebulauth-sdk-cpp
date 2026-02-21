@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(nebulauth_sdk_cpp VERSION 0.1.0 LANGUAGES CXX)
+project(nebulauth_sdk_cpp VERSION 0.2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -29,6 +29,7 @@ find_package(OpenSSL REQUIRED)
 
 add_library(nebulauth_sdk
   src/NebulAuthClient.cpp
+  src/NebulAuthDashboardClient.cpp
 )
 
 target_include_directories(nebulauth_sdk
@@ -72,6 +73,7 @@ if(NEBULAUTH_BUILD_TESTS)
 
   add_executable(nebulauth_sdk_tests
     tests/test_client.cpp
+    tests/test_dashboard_client.cpp
     tests/test_live.cpp
   )
 

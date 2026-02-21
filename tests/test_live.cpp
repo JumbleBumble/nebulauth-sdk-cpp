@@ -2,11 +2,13 @@
 
 #include <cstdlib>
 #include <nebulauth_sdk/NebulAuthClient.hpp>
+#include <nebulauth_sdk/NebulAuthDashboardClient.hpp>
 
 using namespace nebulauth;
 
 namespace {
 constexpr const char* kDefaultBaseUrl = "https://api.nebulauth.com/api/v1";
+constexpr const char* kDefaultDashboardBaseUrl = "https://api.nebulauth.com/dashboard";
 }
 
 TEST_CASE("live verify key env-gated", "[live]") {
@@ -47,4 +49,33 @@ TEST_CASE("live verify key env-gated", "[live]") {
   const auto response = client.verifyKey(input);
   REQUIRE(response.data.is_object());
   REQUIRE(response.data.contains("valid"));
+}
+
+TEST_CASE("live dashboard me env-gated", "[live]") {
+  const char* enabled = std::getenv("NEBULAUTH_LIVE_TEST");
+  if (!enabled || std::string(enabled) != "1") {
+    SUCCEED("Live test disabled. Set NEBULAUTH_LIVE_TEST=1 to enable.");
+    return;
+  }
+
+  const char* baseUrl = std::getenv("NEBULAUTH_DASHBOARD_BASE_URL");
+  const char* bearerToken = std::getenv("NEBULAUTH_DASHBOARD_BEARER_TOKEN");
+
+  if (!bearerToken || std::string(bearerToken).empty()) {
+    SUCCEED("Skipping dashboard live test: set NEBULAUTH_DASHBOARD_BEARER_TOKEN to enable.");
+    return;
+  }
+
+  NebulAuthDashboardClientOptions options;
+  options.baseUrl = (baseUrl && std::string(baseUrl).size() > 0) ? baseUrl : kDefaultDashboardBaseUrl;
+  DashboardAuthOptions auth;
+  auth.mode = DashboardAuthMode::Bearer;
+  auth.sessionCookie = std::nullopt;
+  auth.bearerToken = std::string(bearerToken);
+  options.auth = auth;
+
+  NebulAuthDashboardClient client(options);
+  const auto response = client.me();
+
+  REQUIRE(response.data.is_object());
 }

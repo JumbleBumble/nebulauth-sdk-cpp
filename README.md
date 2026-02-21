@@ -1,6 +1,6 @@
 # NebulAuth C++ SDK
 
-C++ SDK for NebulAuth runtime API with bearer auth, replay protection, and PoP request mode.
+C++ SDK for NebulAuth runtime API and dashboard API with bearer auth, replay protection, and PoP request mode.
 
 ## Structure
 
@@ -36,9 +36,23 @@ set NEBULAUTH_LIVE_TEST=1
 set NEBULAUTH_BEARER_TOKEN=mk_at_...
 set NEBULAUTH_SIGNING_SECRET=mk_sig_...
 set NEBULAUTH_TEST_KEY=mk_live_...
+set NEBULAUTH_DASHBOARD_BEARER_TOKEN=mk_at_...
 
 ctest --test-dir build --output-on-failure -R live
 ```
+
+Live test env vars:
+
+- Required to enable live tests:
+  - `NEBULAUTH_LIVE_TEST=1`
+- Required for runtime live tests:
+  - `NEBULAUTH_BEARER_TOKEN`
+  - `NEBULAUTH_TEST_KEY`
+- Required for dashboard live test:
+  - `NEBULAUTH_DASHBOARD_BEARER_TOKEN`
+- Optional:
+  - `NEBULAUTH_SIGNING_SECRET`
+  - `NEBULAUTH_TEST_HWID`
 
 ## Quick usage
 
@@ -65,3 +79,23 @@ int main() {
   return response.ok ? 0 : 1;
 }
 ```
+
+## Dashboard API usage
+
+```cpp
+#include <nebulauth_sdk/NebulAuthDashboardClient.hpp>
+
+using namespace nebulauth;
+
+NebulAuthDashboardClientOptions options;
+options.auth = DashboardAuthOptions{
+  .mode = DashboardAuthMode::Bearer,
+  .sessionCookie = std::nullopt,
+  .bearerToken = std::string("mk_at_..."),
+};
+
+NebulAuthDashboardClient dashboard(options);
+const auto me = dashboard.me();
+const auto users = dashboard.listUsers();
+```
+
